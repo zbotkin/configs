@@ -1,0 +1,1182 @@
+export JRUBY_OPTS="-X-C -J-client -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -Xcompile.invokedynamic=false --debug"
+
+PATH="$HOME/bin:$PATH"
+PROJECTS_DIR="$HOME/projects/eris_tcs"
+PERSONAL_PROJECTS_DIR="$HOME/PersonalProjects"
+MONGO_SCRIPT_DIR="$HOME/MongoScripts"
+NOTES_DIR="$HOME/Notes"
+JOURNAL_DIR="$HOME/Notes/journal"
+VPN_DIR="$HOME/vpn"
+ISSUES_DIR="$HOME/Issues"
+BOILERPLATE_DIR="$HOME/BoilerplateStuff"
+TEST_CORE_FILES_DIR="$HOME/tmp/ftp/core"
+WALLET_DIR="$HOME/Electron-Cash-4.2.3"
+GOALS_DIR="$HOME/2021Goals"
+
+AMAZON_LIB_LINK="https://read.amazon.com/"
+EMAIL_LINK="https://mail.google.com/mail"
+CALENDAR_LINK="https://calendar.google.com/calendar"
+GITHUB_LINK="https://github.com/ErisExchange"
+JIRA_LINK="https://erisdigital.atlassian.net"
+MARGIN_EXAMPLES_LINK="https://docs.google.com/spreadsheets/d/12yQ48N4h4TL2Q_Dk5fh4U5cXGU1iSGVdBxMDd9ZRi5E/edit"
+MONOREPO_LINK="git@github.com:ErisExchange/eris_tcs.git"
+SPRINT_LINK="https://erisdigital.atlassian.net/secure/RapidBoard.jspa?rapidView=86&projectKey=CO"
+STANDUP_NOTES_LINK="https://docs.google.com/document/d/1Dh8jLhSfk-cc4bASR8-90lQu4-C4EjGLhGb-3mSkIuA/edit#heading=h.butnv2blwar7"
+STANDUP_MEETING_LINK="https://meet.google.com/mxj-shyr-brz?authuser=0"
+RELEASE_SCHED_LINK="https://docs.google.com/spreadsheets/d/1ngmRvkUe96jYVZNtOAQyDPP4FObsUqLLinr2x8phbQo/edit#gid=1090788641"
+
+TREE_FIDDY="https://docs.google.com/spreadsheets/d/1tCojmK_GmMMSdfUncmKzuzIOqP32AcL1HrJwi-HB5eo/edit#gid=0"
+
+JUMPCLOUD="http://console.jumpcloud.com/"
+DATADOG_PROD="https://app.datadoghq.com/apm/home?env=prd"
+DATADOG_NRL="https://app.datadoghq.com/apm/home?env=nrl"
+DATADOG_TEST="https://app.datadoghq.com/apm/home?env=tst"
+DATADOG_DEV="https://app.datadoghq.com/apm/home?env=dev"
+JENKINS_LINK="http://dev-va-jenkins-a1.erisx:8080"
+NBA_LINK="https://www.nba.com/standings"
+
+alias browser-shortcut='google-chrome'
+#alias browser-shortcut='firefox'
+alias bex="bundle exec"
+alias bexr="bundle exec rspec"
+alias gitd='git diff'
+alias gitl='git log'
+alias gits='git status'
+
+alias dif='git diff'
+
+## mispellings
+alias celar="clear"
+alias ckear="clear"
+alias clar="clear"
+alias cear="clear"
+alias lear="clear"
+alias clkear="clear"
+alias cklear="clear"
+alias qclear="clear"
+alias re-soruce="re-source"
+alias re-souce="re-source"
+alias sl="ls"
+alias ks="ls"
+alias porjects="projects"
+alias p="projects"
+alias pp="personal-projects"
+alias guts="gits"
+alias gtis="gits"
+alias giots="gits"
+alias ghts="gits"
+alias ccd="cd"
+
+function dev-vpn() {
+  sudo openvpn --config $VPN_DIR/dev.ovpn
+}
+function test-vpn() {
+  #sudo openvpn --config "$VPN_DIR/test.ovpn"
+  #sudo openvpn --config "$VPN_DIR/test-ohio.ovpn"
+  sudo openvpn --config "$VPN_DIR/profile-45.ovpn"
+}
+function nr-vpn() {
+  sudo openvpn --config $VPN_DIR/nr.ovpn
+}
+function prod-vpn() {
+  sudo openvpn --config $VPN_DIR/prod.ovpn
+}
+function marketops-vpn() {
+  sudo openvpn --config $VPN_DIR/marketops.ovpn
+}
+
+function journal() {
+  if [[ -z $1 ]]
+  then
+    currentDate=`date +"%Y%m%d"`
+    currentFile="$JOURNAL_DIR/$currentDate.txt"
+    touch $currentFile
+    vim $currentFile
+  else
+    filename="$NOTES_DIR/$1.txt"
+    if [ -f "$filename" ]; then
+      vim $filename
+    else
+      echo "no such file \"$filename\""
+    fi
+  fi
+}
+
+function note() {
+  if [[ -z $1 ]]
+  then
+    currentDate=`date +"%Y%m%d"`
+    currentFile="$NOTES_DIR/$currentDate.txt"
+    touch $currentFile
+    vim $currentFile
+  else
+    filename="$NOTES_DIR/$1.txt"
+    if [ -f "$filename" ]; then
+      vim $filename
+    else
+      echo "no such file \"$filename\""
+    fi
+  fi
+}
+
+function notes() {
+  if [ -z $1 ]; then
+    note
+  else
+    note $1
+  fi
+}
+
+function start-all() {
+  ~/bin/mongo-start
+  ~/bin/rabbit-start
+  ~/bin/postgres-start
+}
+
+function stop-all() {
+  ~/bin/mongo-stop
+  ~/bin/rabbit-stop
+  ~/bin/postgres-stop
+}
+
+function source-all-envs() {
+  if [[ -z "$1" ]]
+  then
+    source-all-envs-dev
+  elif [[ "$1" == "dev" ]]
+  then
+    source-all-envs-dev
+  elif [[ "$1" == "test" || "$1" == "tst" ]]
+  then
+    source-all-envs-tst
+  elif [[ "$1" == "nr" || "$1" == "nrl" ]]
+  then
+    source-all-envs-nrl
+  else
+    echo "$1" env not found
+  fi
+}
+function unsource-all-envs() {
+  if [[ -z "$1" ]]
+  then
+    unsource-all-envs-dev
+  elif [[ "$1" == "dev" ]]
+  then
+    unsource-all-envs-dev
+  elif [[ "$1" == "test" || "$1" == "tst" ]]
+  then
+    unsource-all-envs-tst
+  elif [[ "$1" == "nr" || "$1" == "nrl" ]]
+  then
+    unsource-all-envs-nrl
+  else
+    echo "$1" env not found
+  fi
+}
+
+function source-local-postgres() {
+  DISABLE_RISK_POSTGRES="false" \
+  POSTGRES_USER="postgres" \
+  POSTGRES_PASSWORD="local" \
+  POSTGRES_HOST="localhost"
+}
+
+function source-all-envs-dev() {
+  . ~/bin/env-auth0-dev-test
+  . ~/bin/env-ftp-local
+  . ~/bin/env-mongo-dev
+}
+function source-all-envs-tst() {
+  . ~/bin/env-auth0-dev-test
+  . ~/bin/env-ftp-local
+  . ~/bin/env-mongo-test
+  . ~/bin/env-postgres-test
+}
+function source-all-envs-nrl() {
+  . ~/bin/env-auth0-dev-test
+  . ~/bin/env-ftp-local
+  . ~/bin/env-mongo-nrl
+}
+function unsource-all-envs() {
+  . ~/bin/unenv-auth0
+  . ~/bin/unenv-ftp
+  . ~/bin/unenv-mongo
+  . ~/bin/unenv-postgres-test
+}
+
+function rabbit-dev() {
+  RABBIT_HOST=dev-va-rabbitmq-a1.erisx
+}
+
+function mongo-dev() {
+  if [[ -z $1 ]]
+  then
+    mongo --host dev-va-mongodb-a1.erisx:27017 \
+    --username dev_svc \
+    --password zakishoodieman \
+    --authenticationDatabase admin
+  else
+    if [[ -f "$1" ]]
+    then
+      mongo --host dev-va-mongodb-a1.erisx:27017 \
+      --username dev_svc \
+      --password zakishoodieman \
+      --authenticationDatabase admin < "$1"
+    else
+      echo "Query file $1 does not exist!"
+    fi
+  fi
+}
+
+## pretty sure this no longer works
+function build-models() {
+  REPO_NAME=
+  while [ "$1" != "" ]
+  do
+    case $1 in
+      -r | --repo)
+      REPO_NAME="$2"
+      shift
+      shift
+      ;;
+    esac
+  done
+  REPO_DIR="$PROJECTS_DIR/$REPO_NAME"
+  if [[ $REPO_NAME == "" ]]
+  then
+    echo "Need a repo"
+  elif [[ ! -d $REPO_DIR ]]
+  then
+    echo "$REPO_DIR does not exist. Create it with mono-repo"
+  else
+    cd "$REPO_DIR/Common.rb/eris_models_core/ext/java/"
+    rake
+    cd "$REPO_DIR/Common.rb"
+    for i in `find . -maxdepth 2 -name ext`
+    do
+      echo "Building native extensions for ${i}..."
+      (cd $i/*; rake)
+    done
+  fi
+}
+
+# copy-ticket 65.0 65.1
+function copy-tickets() {
+  git fetch --all --tags --prune;
+  git log 0.$1...0.$2 | rg -o "((TUI|CO|TME|IO|RSK)-\d+)" -r '$1' | awk '{print "https://erisdigital.atlassian.net/browse/"toupper($0)}' | sort -V | uniq | xclip -selection clipboard
+}
+
+# copy-git-log 65.0 65.1
+function copy-git-log() {
+  git log --oneline --no-decorate 0.$1...0.$2 | xclip -selection clipboard
+}
+
+function run-statement-generator() {
+
+  REPO_NAME=
+  INSTALL="no"
+  TASK_NAME="generate_statements"
+  TASK_DATE="2020-11-16"
+  USE_LOCAL="no"
+  while [ "$1" != "" ]
+  do
+    case $1 in
+      -r | --repo)
+      REPO_NAME="$2"
+      shift
+      shift
+      ;;
+      -i | --install)
+      INSTALL="yes"
+      shift
+      ;;
+      -t | --task)
+      TASK_NAME="$2"
+      shift
+      shift
+      ;;
+      -d | --date)
+      TASK_DATE="$2"
+      shift
+      shift
+      ;;
+      -l | --local)
+      USE_LOCAL="yes"
+      shift
+      ;;
+    esac
+  done
+
+  if [[ $USE_LOCAL == "yes" ]]
+  then
+    . ~/bin/env-ftp-local
+  else
+    . ~/bin/unenv-ftp
+  fi
+
+  REPO_DIR="$PROJECTS_DIR/$REPO_NAME"
+  if [[ $REPO_NAME == "" ]]
+  then
+    echo "Need a repo to run"
+  elif [[ ! -d "$REPO_DIR" ]]
+  then
+    echo "$REPO_DIR does not exist. Create it with mono-repo"
+  else
+    cd "$REPO_DIR/StatementGenerator"
+    if [[ $INSTALL == "yes" ]]
+    then
+      bundle install
+    fi
+    if [[ $TASK_NAME == "tcr_report" ]]
+    then
+      TASK_NAME_PASCAL="TCRReport"
+    else
+      TASK_NAME_PASCAL=`to-pascal-case $TASK_NAME`
+    fi
+    TASK_MODULE_NAME="Eris::Statements::$TASK_NAME_PASCAL"
+    EXEC_TEXT="load './lib/tasks/$TASK_NAME.rb';\
+    task=$TASK_MODULE_NAME::Task.new(date: \"$TASK_DATE\");\
+    task.run"
+    bundle exec pry --exec "$EXEC_TEXT"
+  fi
+}
+
+function run-all-open-demuxer() {
+    TASK_NAME="all_open_orders_demuxer"
+    TASK_DATE="2023-03-20"
+    TASK_MODULE_NAME="Eris::Statements::AllOpenOrdersDemuxer"
+    EXEC_TEXT="load './lib/tasks/$TASK_NAME.rb';\
+    task=$TASK_MODULE_NAME::Task.new(date: \"$TASK_DATE\");\
+    task.run"
+    bundle exec pry --exec "$EXEC_TEXT"
+}
+
+function ez-corefiles() {
+    TASK_NAME="projected_delivery"
+    TASK_NAME_PASCAL="ProjectedDelivery"
+    TASK_DATE="2022-10-03"
+    ACCOUNT_ID="foo"
+    TASK_MODULE_NAME="Eris::CoreFiles::$TASK_NAME_PASCAL"
+    EXEC_TEXT="load './lib/clearing/tasks/$TASK_NAME.rb';\
+    task=$TASK_MODULE_NAME.new(date: \"$TASK_DATE\", account_id: \"$ACCOUNT_ID\");\
+    task.run"
+    bundle exec pry --exec "$EXEC_TEXT"
+}
+
+function retrieve-reported-transactions() {
+  EXEC_TEXT="load './lib/tasks/retrieve_reported_transactions.rb';\
+  task=Eris::Bmo::RetrieveReportedTransactions::Task.new;\
+  task.run"
+  bundle exec pry --exec "$EXEC_TEXT"
+}
+
+## make this more into a function later i guess
+function nomad-stuff() {
+  export NOMAD_ADDR=http://tst-va-nomad-a1:4646
+  nomad status
+  nomad job status statementgenerator
+  nomad alloc logs 34c82290
+  nomad alloc logs -f 34c82290
+  nomad alloc logs 34c82290 | grep Ping 
+  nomad alloc logs 34c82290 | grep 1604069712
+  nomad status
+  export NOMAD_ADDR=http://tst-va-nomad-a1:4646
+  nomad status
+  nomad job status tradeapi
+  nomad alloc logs a53d07a6
+  nomad alloc logs a53d07a6 | grep -v INFO
+  nomad alloc logs -f a53d07a6
+  nomad alloc logs -f a53d07a6 | grep WARN
+}
+
+#
+#
+#  various 'book-marked' pages for command line access
+#
+#
+
+function email() {
+  browser-shortcut "$EMAIL_LINK"
+}
+
+function calendar() {
+  browser-shortcut "$CALENDAR_LINK"
+}
+
+function standup() {
+  browser-shortcut "$STANDUP_MEETING_LINK"
+}
+
+function standup-notes() {
+  browser-shortcut "$STANDUP_NOTES_LINK"
+}
+
+function my-library() {
+  browser-shortcut "$AMAZON_LIB_LINK"
+}
+
+function tree-fiddy() {
+  browser-shortcut "$TREE_FIDDY"
+}
+
+function jumpcloud() {
+  browser-shortcut "$JUMPCLOUD"
+}
+
+function datadog-prod() {
+  browser-shortcut "$DATADOG_PROD"  
+}
+function datadog-nrl() {
+  browser-shortcut "$DATADOG_NRL"  
+}
+function datadog-test() {
+  browser-shortcut "$DATADOG_TEST"  
+}
+function datadog-dev() {
+  browser-shortcut "$DATADOG_DEV"  
+}
+function jenkins() {
+  if [[ -z "$1" ]]
+  then
+    browser-shortcut "$JENKINS_LINK"
+  else
+    if [[ $1 == "main" || $1 == "tcs" ]]
+    then
+      browser-shortcut "$JENKINS_LINK/job/eris_tcs"
+    else
+      browser-shortcut "$JENKINS_LINK/job/$1"
+    fi
+  fi
+}
+
+alias gh="github"
+
+function jira() {
+  if [[ -z $1 ]]
+  then
+    echo "No args"
+    browser-shortcut "$JIRA_LINK"
+  else
+    browser-shortcut "$JIRA_LINK/browse/CO-$1"
+  fi
+}
+
+function sprint() {
+  if [[ -z $1 ]]
+  then
+    browser-shortcut "$SPRINT_LINK"
+  else
+    browser-shortcut "$SPRINT_LINK&search=$1"
+  fi
+}
+
+function release-sched() {
+  browser-shortcut "$RELEASE_SCHED_LINK"
+}
+
+## work in progress
+OPEN_ISSUES_FILE="$ISSUES_DIR/open-issues.txt" 
+function open-issues() {
+  cat $OPEN_ISSUES_FILE
+}
+
+function current-issue() {
+  jira `open-issues`
+}
+
+function find-replace() {
+  if [[ -z $1 ]]
+  then
+    echo "Need a find"
+  elif [[ -z $2 ]]
+  then
+    echo "Need a replace"
+  else
+    grep -RiIl "$1" | xargs sed -i "s/$1/$2/g"
+  fi
+}
+
+function mono-repo() {
+
+  REPO_NAME=""
+  BUG_OR_FEATURE="f"
+  BRANCH_DESC=""
+  TICKET_NUMBER=""
+  MASTER="no"
+  while [[ $1 != "" ]]
+  do
+    case $1 in
+      -r | --repo | --repo-name)
+      REPO_NAME="$2"
+      shift
+      shift
+      ;;
+      -b | --bug)
+      BUG_OR_FEATURE="b"
+      shift
+      ;;
+      -f | --feature)
+      BUG_OR_FEATURE="f"
+      shift
+      ;;
+      -d | --description | --desc)
+      BRANCH_DESC="$2"
+      shift
+      shift
+      ;;
+      -t | --ticket | --jira)
+      TICKET_NUMBER="$2"
+      shift
+      shift
+      ;;
+      -m | --master)
+      MASTER="yes"
+      shift
+      ;;
+      *)
+      shift
+      ;;
+    esac
+  done
+
+  if [[ -z "$REPO_NAME" ]]
+  then
+    echo "need something to call this repo (-r or --repo or --repo-name)"
+  elif [[ $MASTER == "no" && -z "$TICKET_NUMBER" ]]
+  then
+    echo "need a ticket/jira number (-t or --ticket or --jira)"
+  else
+    cd $PROJECTS_DIR
+    git clone "$MONOREPO_LINK" "$REPO_NAME"
+    cd "$REPO_NAME"
+    if [[ -z "$BRANCH_DESC" ]]
+    then
+      BRANCH_DESC="$REPO_NAME"
+    fi
+    if [[ $MASTER != "yes" ]]
+    then
+      git checkout -b "$BUG_OR_FEATURE/CO$TICKET_NUMBER/$BRANCH_DESC"
+    fi
+  fi
+}
+
+function projects () {
+  if [ -z $1 ]
+  then
+    cd "$PROJECTS_DIR"
+  else
+    cd "$PROJECTS_DIR/$1"
+  fi
+}
+function personal-projects() {
+  cd "$PERSONAL_PROJECTS_DIR"
+}
+
+function parse-git-branch() {
+  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+export PS1="\[\033[32m\]\w\[\033[33m\]\$(parse-git-branch)\[\033[00m\] $ "
+
+function mongo-tst() {
+  mongo --host tst-va-mongodb-a1:27017 \
+  --username zack.botkin \
+  --password "Xevesae0ail4JakoozaeGie0s" \
+  --authenticationDatabase "admin"
+}
+function mongo-nrl() {
+  mongo --host nrl-va-mongodb-a1.erisx:27017 \
+  --username zack.botkin \
+  --password "Ready4goReady4go!" \
+  --authenticationDatabase "admin"
+}
+
+function evars() {
+
+  SHOW_CREDS="no"
+  SHOW_JWT="no"
+  SHOW_MONGO_STUFF="no"
+  SHOW_POSTGRES_STUFF="no"
+  SHOW_RMQ_STUFF="no"
+  SHOW_STATEMENT_STUFF="no"
+
+  if [[ -z "$1" ]]
+  then
+    SHOW_CREDS="yes"
+    SHOW_MONGO_STUFF="yes"
+    SHOW_POSTGRES_STUFF="yes"
+    SHOW_RMQ_STUFF="yes"
+    SHOW_STATEMENT_STUFF="yes"
+  else
+    while [[ "$1" != "" ]]
+    do
+      case $1 in
+        --all)
+        SHOW_CREDS="yes"
+        SHOW_MONGO_STUFF="yes"
+        SHOW_RMQ_STUFF="yes"
+        SHOW_STATEMENT_STUFF="yes"
+        shift
+        ;;
+        -a | -c | --creds | --auth)
+        SHOW_CREDS="yes"
+        shift
+        ;;
+        -j | --jwt)
+        SHOW_JWT="yes"
+        shift
+        ;;
+        -m | --mongo | --db)
+        SHOW_MONGO_STUFF="yes"
+        shift
+        ;;
+        -p | --postgres)
+        SHOW_POSTGRES_STUFF="yes"
+        shift
+        ;;
+        -r | --rmq)
+        SHOW_RMQ_STUFF="yes"
+        shift
+        ;;
+        -s | --statement | --statements | --ftp)
+        SHOW_STATEMENT_STUFF="yes"
+        shift
+        ;;
+      esac
+    done
+  fi
+
+  if [[ $SHOW_JWT == "yes" && $SHOW_CREDS == "no" ]]
+  then
+    echo "----- JWT"
+    echo "JWT_ISSUER:                     $JWT_ISSUER"
+    echo "JWT_PUB_KEY:                    $JWT_PUB_KEY"
+  fi
+  if [[ $SHOW_CREDS == "yes" ]]
+  then
+    echo "----- CREDS"
+    echo "JWT_ISSUER:                     $JWT_ISSUER"
+    echo "AUTH0_ADMIN_UI_AUD:             $AUTH0_ADMIN_UI_AUD"
+    echo "AUTH0_EMP_AUD:                  $AUTH0_EMP_AUD"
+    echo "AUTH0_API_AUD:                  $AUTH0_API_AUD"
+    echo "JWT_PUB_KEY:                    $JWT_PUB_KEY"
+  fi
+  if [[ $SHOW_MONGO_STUFF == "yes" ]]
+  then
+    echo "----- Mongo"
+    echo "MONGO_AUTH_SOURCE:              $MONGO_AUTH_SOURCE"
+    echo "MONGO_DB_NAME:                  $MONGO_DB_NAME"
+    echo "MONGO_HOST:                     $MONGO_HOST"
+    echo "MONGO_PASSWORD:                 $MONGO_PASSWORD"
+    echo "MONGO_USERNAME:                 $MONGO_USERNAME"
+  fi
+  if [[ $SHOW_POSTGRES_STUFF == "yes" ]]
+  then
+    echo "----- Postgres"
+    echo "POSTGRES_USER                   $POSTGRES_USER"
+    echo "POSTGRES_PASSWORD               $POSTGRES_PASSWORD"
+    echo "POSTGRES_HOST                   $POSTGRES_HOST"
+    echo "POSTGRES_DB                     $POSTGRES_DB"
+  fi
+  if [[ $SHOW_RMQ_STUFF == "yes" ]]
+  then
+    echo "----- RMQ"
+    echo "RABBIT_HOST:                    $RABBIT_HOST"
+  fi
+  if [[ $SHOW_STATEMENT_STUFF == "yes" ]]
+  then
+    echo "----- Statements and FTP"
+    echo "ERISX_CORE_SFTP_DETAILS:        $ERISX_CORE_SFTP_DETAILS"
+    echo "MEMBER_STATEMENT_SFTP_BASE_DIR: $MEMBER_STATEMENT_SFTP_BASE_DIR"
+    echo "SFTP_DETAILS:                   $SFTP_DETAILS"
+  fi
+}
+
+function wallet() {
+  $WALLET_DIR/electron-cash --testnet
+}
+
+function set-px-engine() {
+  REPO=""
+  while [[ $1 != "" ]]
+  do
+    case $1 in
+      -r | --repo)
+      REPO="$2"
+      shift
+      shift
+      ;;
+    esac
+  done
+  FULL_DIR="$PROJECTS_DIR/$REPO"
+  if [[ -d $FULL_DIR ]]
+  then
+    export PX_ENGINE_HOME="$FULL_DIR/Dockerfiles/asdf-builder"
+    echo "PX_ENGINE_HOME: $PX_ENGINE_HOME"
+  else
+    echo "directory $FULL_DIR does not exist"
+  fi
+}
+
+function bitgo-access-token() {
+  export BITGO_ACCESS_TOKEN="v2x9bf3cc9684b0d8817c9b64a2ce06e75f8a28f5ed2e9d55e294db2ff34a1dfce2"
+}
+
+function postgres-entry() {
+  psql -h "tst-va-risk-appdb.cefqb8wd0gr6.us-east-1.rds.amazonaws.com" -p 5432 -U "zack.botkin" -d risk
+} 
+
+function yubi() {
+  yubioath-desktop
+}
+
+function agent-no-working() {
+  eval "$(ssh-agent)"
+  ssh-add -l
+}
+
+function tail-docker-logs() {
+  docker-compose logs -f clearingadminui
+}
+function gitterdone() {
+  git submodule update --init --recursive
+  make clean && make
+}
+
+function connect-to-dev-vpn() {
+  #nmcli connection up dev --ask
+  nmcli connection up Dev2 --ask
+}
+function connect-to-test-vpn() {
+  #nmcli connection up test --ask
+  nmcli connection up Tst --ask
+}
+function connect-to-nrl-vpn() {
+  #nmcli connection up nrl --ask
+  nmcli connection up NRL --ask
+}
+
+#. $HOME/.asdf/asdf.sh
+#. $HOME/.asdf/completions/asdf.bash
+
+export JRUBY_OPTS="-X-C -J-client -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -Xcompile.invokedynamic=false"
+
+
+function postgres-user() {
+  ## of course you could update the docker script to set the right name and the you wouldn't have to export the POSTGRES-USER value
+  export POSTGRES_USER=postgres
+}
+
+
+function new-eris-master() {
+  cd $PROJECTS_DIR/eris_tcs
+  git reset --hard
+  git checkout master
+  git pull
+}
+
+function new-eris-rel() {
+  cd $PROJECTS_DIR/eris_tcs
+  if [[ -z $1  ]]
+  then
+    echo "need a rel version"
+  else
+    git reset --hard
+    git checkout "rel-0.$1"
+    git pull
+  fi
+}
+
+function gitproxyhelp() {
+  browser-shortcut https://docs.github.com/en/authentication/troubleshooting-ssh/using-ssh-over-the-https-port
+}
+
+function quick-counter() {
+  bash ~/counter.sh
+}
+
+function nba() {
+  browser-shortcut "$NBA_LINK"
+}
+
+
+## I think if you are using tcs-runner since everything depends on log4j2ruby inside the Common.rb folder if you edit lib/log4j2ruby/log4j2.xml just set the root level to OFF and the appenderref level to OFF i think
+## haven't tried it though
+## or set the level to error to only log errors and higher
+## on the AppenderRef in there
+SSH_ENV="$HOME/.ssh/agent-environment"
+
+function start_agent {
+    echo "Initialising new SSH agent..."
+    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    echo succeeded
+    chmod 600 "${SSH_ENV}"
+    . "${SSH_ENV}" > /dev/null
+    /usr/bin/ssh-add;
+}
+
+# Source SSH settings, if applicable
+
+if [ -f "${SSH_ENV}" ]; then
+    . "${SSH_ENV}" > /dev/null
+    #ps ${SSH_AGENT_PID} doesn't work under cywgin
+    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+        start_agent;
+    }
+else
+    start_agent;
+fi
+# secret key one password
+# A3-6VXX6Z-2WL39K-FN4FK-KYMTV-MNNVC-PAWFE
+
+## gets rid of that god damned bell on tab complete
+#bind -f ~/.inputrc
+
+
+#
+# if ya ever need to get the Statement genny working 3
+#
+#
+#sftp_details[:host] = "files.iris-x.net"
+#sftp_details[:user] = "tstfileszbotkin"
+#sftp_details[:port] = 22
+#sftp_details[:path] = "tsttcs/corefiles/"
+#sftp_details[:env_key] = "MEMBER_DAILY_STATEMENT_SFTP_KEYSTORE_PATH"
+#sftp_details[:key_based_auth] = true
+#sftp_details[:keys] = ['/current/build/StatementGenerator/id_rsa']
+#sftp_details.delete(:password)
+
+# where the key is the normal id_rsa from the .ssh
+# there are a few places in util where this needs to be hardcoded
+
+
+TCS_JWT_TOKEN="Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJnaXZlbl9uYW1lIjoiSm9lIiwiZmFtaWx5X25hbWUiOiJTbWl0aCIsIm5pY2tuYW1lIjoiam9lLnNtaXRoIiwibmFtZSI6IkpvZSBTbWl0aCIsInBpY3R1cmUiOiIiLCJsb2NhbGUiOiJlbiIsInVwZGF0ZWRfYXQiOiIyMDE4LTA5LTE0VDE0OjI2OjUwLjE2MloiLCJlbWFpbCI6ImVuZDFAZXJpc3guY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOi8vZXJpcy1kaWdpdGFsLXRlc3QuYXV0aDAuY29tLyIsInN1YiI6ImVuZDEiLCJhdWQiOiJodHRwczovL2NsZWFyaW5nLmlyaXMteC5uZXQvYXBpIiwiaWF0IjoxNTE0NzY0ODAwLCJleHAiOjEwNDEzNzkyMDAwLCJhY3IiOiJodHRwOi8vc2NoZW1hcy5vcGVuaWQubmV0L3BhcGUvcG9saWNpZXMvMjAwNy8wNi9tdWx0aS1mYWN0b3IiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIHdyaXRlOm9yZGVyIHJlYWQ6Y2xlYXJpbmdfYXBpIHdyaXRlOmJsb2NrX3RyYWRlIHdyaXRlOnNldHRsZW1lbnRfcmVxdWVzdCB3cml0ZTpjdXN0b21lcl9hY2NvdW50X3JlZmVyZW5jZSByZWFkOmN1c3RvbWVyX2FjY291bnRfcmVmZXJlbmNlIHJlYWQ6dGF4X2RvY3VtZW50cyB3cml0ZTp0YXhfZG9jdW1lbnRzIn0.pzUn9VmTrMPjErHWDevvgqCfkhepsQPL7ay4mrjYOCXO7K93nro5a6VjENpYs0gupDU2b0L43gkjnSlh0tNx_L4zsMAgZCaDYrArCUrhf_a-jiYISpjiB_cSEkcT7bXusU8FtL2a4XOSN8YMF8J_n3jfT_nkWi25aDLyBAzCXyA"
+
+
+TASK_NAME="Eris::Clearing::ContractDelivery"
+TASK_ARGS="--date 2024-07-08"
+TASK_TIME="2024-07-08T14:00:00.000Z"
+
+function hit-trigger-task() {
+	curl -X POST \
+		localhost:3002/api/v1/trigger_task \
+		-H "$TCS_JWT_TOKEN" \
+		-H "Content-Type: application/json" \
+		-d "{\"name\": \"$TASK_NAME\", \"options\": \"$TASK_ARGS\", \"time\": \"$TASK_TIME\"}"
+}
+
+JAVA_SPRING_DIR="$PROJECTS_DIR/eris_tcs/java-spring"
+KAIKO_SERVICE_DIR="$JAVA_SPRING_DIR/kaiko-index-service"
+function ping-publish-realtime-kaiko-service-endpoint() {
+	#curl localhost:8080/realtime-index-rates
+	#curl localhost:9080/publish-realtime-rate-to-rmq
+	curl localhost:9082/publish_tcr
+}
+function ping-local-publish-tcr() {
+	curl localhost:8080/publish_tcr
+}
+function ping-local-publish-ts() {
+	curl localhost:8080/publish_trading_session
+}
+function ping-docker-publish-tcr() {
+  SEQUENCE_NUMBER="${1:-1}"
+  echo "USING $SEQUENCE_NUMBER"
+	curl "localhost:9080/publish_tcr?seqNumber=$SEQUENCE_NUMBER"
+}
+function ping-docker-publish-ts() {
+	curl localhost:9080/publish_trading_session
+}
+
+function ping-local-task-manager-retrieve_funding_rate() {
+  echo "running for $1"
+  curl "localhost:8085/run_retrieve_funding_rate/$1"
+}
+function ping-local-task-manager-run_trades_file_upload() {
+  echo "running for $1"
+  curl "localhost:8085/run_trades_file_upload/$1"
+}
+
+EXCHANGE_MIC_CODE="XCBF"
+REGION_NAME="OH"
+ALLOC_ID="1"
+
+function get-sequence-number() {
+  curl "localhost:9090/api/current_sequence_number?exchangeMicCode=$EXCHANGE_MIC_CODE&regionName=$REGION_NAME&allocId=$ALLOC_ID"
+}
+function set-sequence-number() {
+  SEQUENCE_NUMBER="${1:-1}"
+  curl "localhost:9090/api/set_current_fix_sequence_number?exchangeMicCode=$EXCHANGE_MIC_CODE&regionName=$REGION_NAME&allocId=$ALLOC_ID&sequenceNumber=$SEQUENCE_NUMBER"
+}
+
+
+KAIKO_API_KEY="775902e7748c03dd8046e28ee1b1703f"
+
+function dock-comp() {
+  docker-compose -f docker-compose.yml -f docker-compose.local.yml
+}
+
+alias integration_test='eval $(cat ~/projects/eris_nomad/test/common.env | grep -v "^$" | grep -v "^#" | sed "s/\"/\\\\\"/g" | sed "s/=/=\"/" | sed "s/$/\"/" | sed "s/^/export /"); RABBIT_HOST=localhost MONGO_REPLICA_SET=localhost:27017 JRUBY_OPTS= BITGO_CUSTOM_ROOT_URI=http://localhost:1080 $1 $2 $3'
+
+function connect-to-sftp() {
+	sftp -i ~/.ssh/id_rsa tstfileszbotkin@files.iris-x.net
+}
+
+
+#
+# Rec Report
+#
+
+PYTHON_PROJECTS_DIR="/home/zbotkin/projects/eris_tcs/python"
+PYTHON_CLEARING_REPORTS_DIR="$PYTHON_PROJECTS_DIR/ClearingReports"
+PYTHON_COMMON_DIR="$PYTHON_PROJECTS_DIR/cboe_digital_common"
+
+function cfe-rec-report-tests() {
+  cd "$PYTHON_CLEARING_REPORTS_DIR"
+  LOG_LEVEL="DEBUG" PYTHONPATH=. python3 tests/test_reconciliation_report_cfe_tcs.py
+}
+function test-rec-utils() {
+  cd "$PYTHON_CLEARING_REPORTS_DIR"
+  LOG_LEVEL="DEBUG" PYTHONPATH=. python3 tests/test_reconciliation_util.py
+}
+
+function python-unit-tests() {
+  cd "$PYTHON_COMMON_DIR"
+  LOG_LEVEL="DEBUG" PYTHONPATH=. python3 tests/test_task.py
+}
+
+#export DATE_FOR_REC_REPORT="20250930"
+#export DATE_FOR_REC_REPORT="20251001"
+export DATE_FOR_REC_REPORT="20260226"
+
+#
+# "Trading session"
+#
+
+function cfe-rec-report-local-show() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RUN_AS_SCRIPT="true" USE_LOCAL_ENV_FILE="true" OPEN_REC_REPORT_FOR_VIEWING="true" GET_FILE_FROM_DISK="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe.py
+}
+function cfe-rec-report-local-longrunning-show() {
+  cd "$PYTHON_PROJECTS_DIR"
+  USE_LOCAL_ENV_FILE="true" OPEN_REC_REPORT_FOR_VIEWING="true" GET_FILE_FROM_DISK="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe.py
+}
+function cfe-rec-report-sftp-show() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RUN_AS_SCRIPT="true" USE_LOCAL_ENV_FILE="true" OPEN_REC_REPORT_FOR_VIEWING="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe.py
+}
+
+#
+# "Detailed"
+#
+
+function cfe-rec-report-detailed-local-show() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RUN_AS_SCRIPT="true" USE_LOCAL_ENV_FILE="true" OPEN_REC_REPORT_FOR_VIEWING="true" GET_FILE_FROM_DISK="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe_detailed.py
+}
+function cfe-rec-report-detailed-local-publish() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RUN_AS_SCRIPT="true" USE_LOCAL_ENV_FILE="true" GET_FILE_FROM_DISK="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe_detailed.py
+}
+function cfe-rec-report-detailed-sftp-show() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RUN_AS_SCRIPT="true" USE_LOCAL_ENV_FILE="true" OPEN_REC_REPORT_FOR_VIEWING="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe_detailed.py
+}
+function cfe-rec-report-detailed-sftp-publish() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RUN_AS_SCRIPT="true" USE_LOCAL_ENV_FILE="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=. python3 ClearingReports/trade_rec_cfe_detailed.py
+}
+
+#
+# Run connected to the rmq instance
+#
+
+function python-test-one() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RABBIT_HOST="localhost" RABBIT_PORT=6672 RABBIT_USERNAME="guest" RABBIT_PASSWORD="guest" RABBIT_VHOST="/" USE_LOCAL_ENV_FILE="true" OPEN_REC_REPORT_FOR_VIEWING="true" GET_FILE_FROM_DISK="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe_detailed.py
+}
+function python-test-two() {
+  cd "$PYTHON_PROJECTS_DIR"
+  RABBIT_HOST="localhost" RABBIT_PORT=6672 RABBIT_USER="guest" RABBIT_PASSWORD="guest" RABBIT_VHOST="/" USE_LOCAL_ENV_FILE="true" OPEN_REC_REPORT_FOR_VIEWING="true" GET_FILE_FROM_DISK="true" LOG_LEVEL="DEBUG" RECONCILIATION_REPORT_CFE_TCS_DATE="$DATE_FOR_REC_REPORT" PYTHONPATH=.:cboe_digital_common:ClearingReports python3 ClearingReports/trade_rec_cfe.py
+}
+
+#
+# Tail risk back test
+#
+function tail-risk-back-test() {
+  cd "$PYTHON_PROJECTS_DIR"
+  DB_HOST="risk-appdb-replica.iris-x.net" DB_NAME="risk" DB_USER="zack.botkin" DB_PASSWORD="aeKoo2eth9Rio0Aengee6kohChu" SPOT_PRICE_SOURCES="('tradeblock',)" SPOT_PRICE_EXCHANGES="('index',)" SPOT_CLOSE_HOUR=15 FUTURES_EXPIRATIONS="(1, 2, 3, 4)" FUTURES_PRICE_SOURCES="('barchart',)" FUTURES_PRICE_EXCHANGES="('cme',)" FUTURES_CLOSE_HOUR=16 LOG_LEVEL="DEBUG" PYTHONPATH=.:cboe_digital_common python3 RiskReports/daily_tms_tail_risk_backtest_task.py --backtest-period 1 --confidence-level 0.01 --significance-level 0.05 --days-coverage 2 --lookback-period 5 --smoothing-factor 0.01 --warm-up-period 6
+}
+
+function dv2-creds-regen() {
+  echo -e "Please enter your AWS MFA DEV TOKEN: \n"
+  read aws_mfa
+  # 90000 == 25 hours == plenty-o-time
+  ~/bin/get-token.py --profile dv2 --duration 90000 $aws_mfa 
+}
+
+## this crashes my tmux window so figure out wtf is going on here
+function replace-aws-creds-in-env() {
+
+	CREDS_FILE="$HOME/.aws/credentials"
+	TARGET_FILE="$1"
+
+	if [ -z "$TARGET_FILE" ]; then
+  	echo "Usage: $0 <file_to_update>"
+  	exit 1
+	fi
+
+	# Loop over each line in the creds file
+	while IFS='=' read -r key value; do
+    	# skip empty lines or comments
+    	[[ -z "$key" || "$key" =~ ^# ]] && continue
+
+    	# Trim whitespace
+    	key=$(echo "$key" | xargs)
+    	value=$(echo "$value" | xargs)
+
+			upper_key=${key^^}
+
+    	# If line already exists in target, replace it; otherwise, append it
+    	if grep -q "^export $upper_key=" "$TARGET_FILE"; then
+        	sed -i "s|^export $upper_key=.*|export $upper_key=$value|" "$TARGET_FILE"
+    	else
+        	echo "export $upper_key=$value" >> "$TARGET_FILE"
+    	fi
+	done < "$CREDS_FILE"
+
+	echo "Updated $TARGET_FILE with values from $CREDS_FILE"
+
+}
+
+#
+# S3/AWS helpers
+#
+
+S3_DIR="s3://erisx-dv2-sftp/dv2tcs/zach_test/"
+S3_TRADES_FILES_DIR="s3://erisx-dv2-sftp/dv2tcs/trades_files/"
+S3_PROCESSED_DIR="s3://erisx-dv2-sftp/dv2tcs/zach_test/processed/"
+
+TRADES_FILE="/home/zbotkin/corefiles/tcs-corefiles/trades_XCBF_20251015_01.csv"
+
+function s3-lookat-trades-files() {
+  aws s3 ls $S3_TRADES_FILES_DIR
+}
+function s3-upload-trades-files() {
+  echo "$TRADES_FILE"
+  echo "$S3_TRADES_FILES_DIR"
+  aws s3 cp $TRADES_FILE $S3_TRADES_FILES_DIR
+}
+function s3-lookat-files() {
+	aws s3 ls $S3_DIR
+}
+function s3-lookat-processed-files() {
+	aws s3 ls $S3_PROCESSED_DIR
+}
+
+function s3-reset-files() {
+	aws s3 mv "$S3_PROCESSED_DIR/funding_rates_XCBF_20250806_0900.csv" $S3_DIR 
+	aws s3 mv "$S3_PROCESSED_DIR/funding_rates_XCBF_20250806_0800.csv" $S3_DIR 
+}
+
+
+#
+# Example project eu
+#
+function test-example-project() {
+  test-example-trades
+  test-example-positions
+}
+
+#
+# Trades
+#
+
+function test-example-trades() {
+  test-delete-trades
+  test-save-trades
+  test-get-trades
+  test-delete-trades
+  test-get-trades
+}
+
+function test-save-trades() {
+  curl localhost:9096/test/test_save_trades
+}
+
+function test-get-trades() {
+  curl localhost:9096/test/test_get_trades
+}
+
+function test-delete-trades() {
+  curl localhost:9096/test/test_delete_trades
+}
+
+#
+# Positions
+#
+
+function test-example-positions() {
+  test-delete-positions
+  test-save-positions
+  test-get-positions
+  test-delete-positions
+  test-get-positions
+}
+
+function test-save-positions() {
+  curl localhost:9096/test/test_save_positions
+}
+function test-save-positions-bad-jwt() {
+  curl localhost:9096/test/test_save_positions_bad_jwt
+}
+
+function test-get-positions() {
+  curl localhost:9096/test/test_get_positions
+}
+
+function test-delete-positions() {
+  curl localhost:9096/test/test_delete_positions
+}
+
+#
+# Settled positions
+#
+
+function test-example-settled-positions() {
+  test-delete-settled-positions
+  test-save-settled-positions
+  test-get-settled-positions
+  test-delete-settled-positions
+  test-get-settled-positions
+}
+
+function test-save-settled-positions() {
+  curl localhost:9096/test/test_save_settled_positions
+}
+
+function test-get-settled-positions() {
+  curl localhost:9096/test/test_get_settled_positions
+}
+
+function test-delete-settled-positions() {
+  curl localhost:9096/test/test_delete_settled_positions
+}
+
+#
+# Risk DB dv2
+#
+
+function risk-db-dv2() {
+  PGPASSWORD=oGXThJMt7Pqp6TznUhmXKzq9UmHAhrBRREnM psql -h dv2-va-risk-appdb.c60w6vto9cty.us-east-1.rds.amazonaws.com -U zach.botkin -d risk
+}
+
+#
+#	Source qatf functions
+#
+source ~/configs/.qatf.rc
+
+#
+# Source the one in tcs shared bashed
+#
+source ~/projects/eris_tcs/bash/.shared_tcs_bashrc
+
+
